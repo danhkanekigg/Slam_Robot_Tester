@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<robot name="diff_drive_robot">
+
+  <!-- Vật liệu màu sắc -->
+  <material name="chassis_color"><color rgba="0.2 0.2 0.8 0.8"/></material>
+  <material name="wheel_color"><color rgba="0.1 0.1 0.1 1.0"/></material>
+  <material name="caster_color"><color rgba="0.8 0.8 0.8 1.0"/></material>
+  <material name="lidar_color"><color rgba="0.9 0.1 0.1 1.0"/></material>
+
+  <!-- Khung toạ độ đáy tiếp đất (base_footprint) nằm tại trung điểm hình chiếu trục 2 bánh chủ động -->
+  <link name="base_footprint"/>
+
+  <!-- Khung thân xe chính (base_link) -->
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <!-- Nâng lên theo bán kính bánh xe 32.5mm = 0.0325m -->
+    <origin xyz="0 0 0.0325" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <!-- Khung thân xe hình hộp chữ nhật hoặc elip -->
+    <visual>
+      <origin xyz="0.04 0 0.02" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.22 0.18 0.04"/>
+      </geometry>
+      <material name="chassis_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0.04 0 0.02" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.22 0.18 0.04"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 1. BÁNH CHỦ ĐỘNG TRÁI (LEFT DRIVE WHEEL)   -->
+  <!-- ========================================== -->
+  <joint name="left_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="left_wheel_link"/>
+    <!-- Đặt tại trục Y = +0.08m (Khoảng cách giữa 2 bánh L = 0.16m) -->
+    <origin xyz="0 0.08 0" rpy="-1.5707963 0 0"/>
+  </joint>
+
+  <link name="left_wheel_link">
+    <visual>
+      <geometry>
+        <!-- Bán kính 0.0325m (đường kính 65mm), bề rộng 0.025m -->
+        <cylinder radius="0.0325" length="0.025"/>
+      </geometry>
+      <material name="wheel_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.0325" length="0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 2. BÁNH CHỦ ĐỘNG PHẢI (RIGHT DRIVE WHEEL) -->
+  <!-- ========================================== -->
+  <joint name="right_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="right_wheel_link"/>
+    <!-- Đặt tại trục Y = -0.08m -->
+    <origin xyz="0 -0.08 0" rpy="1.5707963 0 0"/>
+  </joint>
+
+  <link name="right_wheel_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.0325" length="0.025"/>
+      </geometry>
+      <material name="wheel_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.0325" length="0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 3. BÁNH TỰ DO / CASTOR WHEEL (PHÍA TRƯỚC)  -->
+  <!-- ========================================== -->
+  <joint name="caster_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster_wheel_link"/>
+    <!-- Đặt phía trước trục bánh chủ động 12cm (x = +0.12m), hạ sát mặt đất -->
+    <origin xyz="0.12 0 -0.0175" rpy="0 0 0"/>
+  </joint>
+
+  <link name="caster_wheel_link">
+    <visual>
+      <!-- Bánh tự do dạng hình cầu lăn tiếp đất (bán kính 15mm) -->
+      <geometry>
+        <sphere radius="0.015"/>
+      </geometry>
+      <material name="caster_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <sphere radius="0.015"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- CẢM BIẾN QUÁN TÍNH MPU6050 (IMU)           -->
+  <!-- ========================================== -->
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0.02 0 0.04" rpy="0 0 0"/>
+  </joint>
+
+  <link name="imu_link"/>
+
+  <!-- ========================================== -->
+  <!-- CẢM BIẾN LIDAR LD14                        -->
+  <!-- ========================================== -->
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser_frame"/>
+    <!-- Đặt cao hơn thân xe 10cm tại trục giữa -->
+    <origin xyz="0.05 0 0.12" rpy="0 0 0"/>
+  </joint>
+
+  <link name="laser_frame">
+    <visual>
+      <geometry>
+        <cylinder radius="0.035" length="0.03"/>
+      </geometry>
+      <material name="lidar_color"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.035" length="0.03"/>
+      </geometry>
+    </collision>
+  </link>
+
+</robot>
+
