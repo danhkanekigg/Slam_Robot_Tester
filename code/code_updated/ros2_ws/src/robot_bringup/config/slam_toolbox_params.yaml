@@ -1,0 +1,66 @@
+slam_toolbox:
+  ros__parameters:
+
+    # 1. Plugin và giải thuật tối ưu đồ thị (Ceres Solver)
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None
+
+    # 2. Cấu hình Frame toạ độ chuẩn ROS REP-105
+    odom_frame: odom
+    map_frame: map
+    base_frame: base_footprint
+    scan_topic: /scan_relay
+    mode: mapping # Chế độ lập bản đồ
+
+    # 3. Quản lý thời gian & TF
+    debug_logging: false
+    throttle_scans: 1
+    transform_publish_period: 0.02 # 50Hz cập nhật TF mượt mà
+    map_update_interval: 2.0
+    resolution: 0.05               # Độ phân giải lưới bản đồ: 5cm / ô
+    max_laser_range: 8.5          # Tầm quét tối đa khớp không gian mê cung (8m x 8m)
+    min_laser_range: 0.15          # Lọc toàn bộ điểm phản xạ từ thân xe (< 15cm)
+    minimum_time_interval: 0.05
+    transform_timeout: 0.5
+    tf_buffer_duration: 60.0
+    stack_size_to_use: 40000000
+    enable_interactive_mode: true
+
+    # 4. Ngưỡng lấy mẫu tạo nút đồ thị (Graph Nodes)
+    # Lấy mẫu tối ưu để tránh tạo dày đặc nút đồ thị khi robot đổi hướng nhẹ làm méo góc xoay bản đồ
+    minimum_travel_distance: 0.15 # Lấy mẫu mỗi khi đi 15cm
+    minimum_travel_heading: 0.20  # Lấy mẫu mỗi khi xoay ~11.5 độ (giữ góc bản đồ luôn thẳng đứng, tuyệt đối không bị xoay xiên)
+
+    # 5. Tham số Scan Matcher (Khớp quét tia Laser)
+    use_scan_matching: true
+    use_scan_barycenter: true
+    scan_buffer_size: 30          # Giữ 30 frame quét gần nhất trong bộ nhớ
+    scan_buffer_maximum_scan_distance: 8.5
+    link_match_minimum_response_fine: 0.15
+    link_scan_maximum_distance: 2.5 # Kết nối các điểm quét trong bán kính 2.5m
+
+    # 6. Khép vòng lặp (Loop Closure - Chống tích lũy sai số khi đi vòng xa)
+    do_loop_closing: true
+    loop_search_maximum_distance: 8.0 # Tìm kiếm khép vòng trong toàn bộ không gian 8m x 8m (cũ 3m)
+    loop_match_minimum_chain_size: 6   # Nhận diện vòng lặp nhanh và nhạy hơn
+    loop_match_maximum_variance_coarse: 3.0
+    loop_match_minimum_response_coarse: 0.35
+    loop_match_minimum_response_fine: 0.45
+
+    # 7. Vùng tìm kiếm tương quan (Correlation Search Space)
+    # Mở rộng không gian tìm kiếm để tự động nắn thẳng nếu Odometry bị trôi
+    correlation_search_space_dimension: 0.8 # Vùng tìm kiếm dịch chuyển rộng 80cm (cũ 50cm)
+    correlation_search_space_resolution: 0.01
+    correlation_search_space_smear_deviation: 0.03
+
+    # 8. Góc quét tìm kiếm tương quan (Correlation Angle Search - CỰC KỲ QUAN TRỌNG)
+    # Giúp thuật toán tự động bù sai lệch góc quay của bánh xe lên tới +/- 20 độ
+    coarse_search_angle_offset: 0.349 # Quét thô tìm kiếm góc sai lệch +/- 20 độ (~0.349 rad)
+    coarse_angle_resolution: 0.0349   # Bước nhảy góc quét thô 2 độ
+    minimum_angle_penalty: 0.9
+    minimum_distance_penalty: 0.5
+    use_response_expansion: true

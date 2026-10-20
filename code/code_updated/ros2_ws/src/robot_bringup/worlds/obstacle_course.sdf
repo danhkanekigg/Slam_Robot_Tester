@@ -1,0 +1,293 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="obstacle_course_world">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Ánh sáng môi trường -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 12 0 0 0</pose>
+      <diffuse>0.85 0.85 0.9 1</diffuse>
+      <specular>0.25 0.25 0.25 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.4 0.2 -0.85</direction>
+    </light>
+
+    <!-- Mặt sàn 20m x 20m -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.6 0.6 0.62 1</ambient>
+            <diffuse>0.6 0.6 0.62 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- BẢN ĐỒ CẤP ĐỘ 4 (CỰC KHÓ / EXPERT):                    -->
+    <!-- MÊ CUNG KỸ THUẬT CAO, KHE HẸP 58CM & BẪY CHỮ U SÂU     -->
+    <!-- Kích thước: 7m x 7m, Toạ độ: X [-3.5, 3.5], Y [-3.5, 3.5]-->
+    <!-- Đặc điểm độ khó:                                       -->
+    <!--   - Khe cửa thắt nút đúng 58cm (sát giới hạn xe 19cm)   -->
+    <!--   - Đường zíc zắc chữ S liên tiếp (90 độ liên tục)      -->
+    <!--   - Bẫy chữ U sâu (U-Trap) bít 3 mặt, bắt buộc quay 180°-->
+    <!--   - Vòng lặp khép kín (Double Loop Closure) kiểm tra SLAM-->
+    <!--   - Cột tròn slalom zíc zắc tạo thắt nút cổ chai        -->
+    <!-- ======================================================= -->
+
+    <!-- Tường ngoài Bắc (Y = +3.5) -->
+    <model name="wall_outer_north">
+      <static>true</static>
+      <pose>0 3.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>7.2 0.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>7.2 0.2 1.0</size></box></geometry>
+        <material><diffuse>0.25 0.25 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Nam (Y = -3.5) -->
+    <model name="wall_outer_south">
+      <static>true</static>
+      <pose>0 -3.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>7.2 0.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>7.2 0.2 1.0</size></box></geometry>
+        <material><diffuse>0.25 0.25 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Tây (X = -3.5) -->
+    <model name="wall_outer_west">
+      <static>true</static>
+      <pose>-3.5 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.2 7.0 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 7.0 1.0</size></box></geometry>
+        <material><diffuse>0.25 0.25 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Đông (X = +3.5) -->
+    <model name="wall_outer_east">
+      <static>true</static>
+      <pose>3.5 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.2 7.0 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 7.0 1.0</size></box></geometry>
+        <material><diffuse>0.25 0.25 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- PHÂN VÙNG 1 (TÂY BẮC): ĐƯỜNG GẤP KHÚC ZIGZAG CHỮ S      -->
+    <!-- ======================================================= -->
+
+    <!-- Vách dọc Tây 1: X = -2.6, Y từ 1.2 đến 3.5 -->
+    <model name="zigzag_v1">
+      <static>true</static>
+      <pose>-2.6 2.35 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 2.3 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 2.3 1.0</size></box></geometry>
+        <material><diffuse>0.8 0.2 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách dọc Tây 2: X = -1.6, Y từ 0.6 đến 2.8 -->
+    <model name="zigzag_v2">
+      <static>true</static>
+      <pose>-1.6 1.7 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 2.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 2.2 1.0</size></box></geometry>
+        <material><diffuse>0.8 0.2 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách ngang nối zíc zắc: Y = 2.1, X từ -3.5 đến -3.0 -->
+    <model name="zigzag_baffle_1">
+      <static>true</static>
+      <pose>-3.25 2.1 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.5 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.5 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.8 0.2 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- PHÂN VÙNG 2 (TÂY NAM): BẪY CHỮ U SÂU (DEEP U-TRAP)     -->
+    <!-- ======================================================= -->
+
+    <!-- Cánh Tây của bẫy U: X = -2.6, Y từ -0.6 đến -2.8 -->
+    <model name="utrap_west">
+      <static>true</static>
+      <pose>-2.6 -1.7 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 2.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 2.2 1.0</size></box></geometry>
+        <material><diffuse>0.9 0.45 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Cánh Đông của bẫy U: X = -1.4, Y từ -0.6 đến -2.8 -->
+    <model name="utrap_east">
+      <static>true</static>
+      <pose>-1.4 -1.7 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 2.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 2.2 1.0</size></box></geometry>
+        <material><diffuse>0.9 0.45 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Đáy kín của bẫy U: Y = -2.8, X từ -2.6 đến -1.4 -->
+    <model name="utrap_bottom">
+      <static>true</static>
+      <pose>-2.0 -2.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.35 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.35 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.9 0.45 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- PHÂN VÙNG 3 (ĐÔNG BẮC): KHE CỬA THẮT NÚT 58CM (BOTTLENECK)-->
+    <!-- ======================================================= -->
+
+    <!-- Vách ngang 1: Y = 1.6, X từ 0.7 đến 2.2 -->
+    <model name="gate_wall_1">
+      <static>true</static>
+      <pose>1.45 1.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.5 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.5 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.2 0.7 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách ngang 2: Y = 1.6, X từ 2.78 đến 3.5 -->
+    <!-- Khe hở từ X = 2.2 đến 2.78 đúng bằng 0.58m! -->
+    <model name="gate_wall_2">
+      <static>true</static>
+      <pose>3.14 1.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.72 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.72 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.2 0.7 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách dọc ngăn phòng kín sau khe hẹp: X = 1.8, Y từ 1.6 đến 3.5 -->
+    <model name="gate_inner_divider">
+      <static>true</static>
+      <pose>1.8 2.55 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 1.9 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 1.9 1.0</size></box></geometry>
+        <material><diffuse>0.2 0.7 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- PHÂN VÙNG 4 (ĐÔNG NAM): VÒNG LẶP & CỘT SLALOM          -->
+    <!-- ======================================================= -->
+
+    <!-- Vách ngăn cách ly khu Đông Nam: X = 0.8, Y từ -3.5 đến -0.6 -->
+    <model name="slalom_divider">
+      <static>true</static>
+      <pose>0.8 -2.05 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 2.9 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 2.9 1.0</size></box></geometry>
+        <material><diffuse>0.2 0.45 0.75 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách đảo ở giữa tạo hành lang vòng lặp: X = 2.2, Y từ -2.8 đến -1.2 -->
+    <model name="loop_island">
+      <static>true</static>
+      <pose>2.2 -2.0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.4 1.6 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.4 1.6 1.0</size></box></geometry>
+        <material><diffuse>0.2 0.45 0.75 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Cột tròn Slalom 1 -->
+    <model name="slalom_col_1">
+      <static>true</static>
+      <pose>1.5 -1.2 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><cylinder><radius>0.18</radius><length>1.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.18</radius><length>1.0</length></cylinder></geometry>
+        <material><diffuse>0.9 0.75 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Cột tròn Slalom 2 -->
+    <model name="slalom_col_2">
+      <static>true</static>
+      <pose>2.9 -2.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><cylinder><radius>0.18</radius><length>1.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.18</radius><length>1.0</length></cylinder></geometry>
+        <material><diffuse>0.9 0.75 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- KHU TRUNG TÂM (TÂM 0,0 HOÀN TOÀN TRỐNG BÁN KÍNH 1.1M)    -->
+    <!-- ======================================================= -->
+
+    <!-- Cột tròn định hướng phía Bắc và Nam -->
+    <model name="center_pillar_north">
+      <static>true</static>
+      <pose>0.0 1.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><cylinder><radius>0.18</radius><length>1.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.18</radius><length>1.0</length></cylinder></geometry>
+        <material><diffuse>0.5 0.5 0.55 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="center_pillar_south">
+      <static>true</static>
+      <pose>0.0 -1.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><cylinder><radius>0.18</radius><length>1.0</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.18</radius><length>1.0</length></cylinder></geometry>
+        <material><diffuse>0.5 0.5 0.55 1</diffuse></material></visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

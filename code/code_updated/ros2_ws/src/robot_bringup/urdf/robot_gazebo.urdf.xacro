@@ -1,0 +1,339 @@
+<?xml version="1.0"?>
+<robot name="diff_drive_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- ========================================== -->
+  <!-- ĐỊNH NGHĨA VẬT LIỆU MÀU SẮC (RVIZ)        -->
+  <!-- ========================================== -->
+  <material name="chassis_color"><color rgba="0.15 0.35 0.85 0.9"/></material>
+  <material name="wheel_color"><color rgba="0.1 0.1 0.1 1.0"/></material>
+  <material name="caster_color"><color rgba="0.85 0.85 0.85 1.0"/></material>
+  <material name="lidar_color"><color rgba="0.9 0.1 0.1 1.0"/></material>
+
+  <!-- ========================================== -->
+  <!-- 1. CHUẨN ROS REP-105: base_footprint       -->
+  <!-- ========================================== -->
+  <link name="base_footprint"/>
+
+  <!-- ========================================== -->
+  <!-- 2. KHUNG TỌA ĐỘ TRỤC XE: base_link        -->
+  <!-- Nằm tại trung điểm trục 2 bánh chủ động (cách đất R = 0.0325m) -->
+  <!-- ========================================== -->
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.0325" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <!-- Visual hiển thị bằng file mesh .stl của khung gầm 2 tầng -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_bringup)/meshes/chassis.stl"/>
+      </geometry>
+      <material name="chassis_color"/>
+    </visual>
+    <!-- Collision thân xe 2 tầng khớp bản vẽ 3D FreeCAD, không cọ sàn -->
+    <collision>
+      <origin xyz="0.020 0 0.020" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.210 0.170 0.022"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.020 0 0.065" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.210 0.170 0.025"/>
+      </geometry>
+    </collision>
+    <!-- Trọng tâm thực tế tính toán chính xác từ toàn bộ 50 linh kiện bản vẽ 3D cập nhật (file 3d/RBSlam.step) -->
+    <!-- X=0.0165m (cách trục bánh 1.65cm về phía trước), Y=-0.0010m, Z=0.0263m (cách mặt đất 5.88cm) -->
+    <!-- Phân bổ lực: 83.0% đè lên 2 bánh chủ động (lực kéo tối đa), 17.0% đè lên bánh caster trước -->
+    <inertial>
+      <origin xyz="0.0165 -0.0010 0.0263" rpy="0 0 0"/>
+      <mass value="1.783"/>
+      <inertia ixx="0.00433" ixy="0.0" ixz="0.0" iyy="0.00661" iyz="0.0" izz="0.00682"/>
+    </inertial>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 3. BÁNH CHỦ ĐỘNG TRÁI (left_wheel_link)   -->
+  <!-- ========================================== -->
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel_link"/>
+    <origin xyz="0 0.0685 0" rpy="-1.5707963 0 0"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="0.05" friction="0.02"/>
+  </joint>
+
+  <link name="left_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_bringup)/meshes/wheel.stl"/>
+      </geometry>
+      <material name="wheel_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <!-- Dạng hình học tiếp xúc hình cầu bán kính 32.5mm: Điểm tiếp xúc chuẩn tâm trục Y=±0.0685m, -->
+        <!-- triệt tiêu hiện tượng bó mép cọ sàn khi quay vi sai tại chỗ, giúp Odometry ăn khớp 100% với góc xoay thực tế -->
+        <sphere radius="0.0325"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.10"/>
+      <inertia ixx="0.000030" ixy="0" ixz="0" iyy="0.000030" iyz="0" izz="0.000050"/>
+    </inertial>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 4. BÁNH CHỦ ĐỘNG PHẢI (right_wheel_link)  -->
+  <!-- ========================================== -->
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel_link"/>
+    <origin xyz="0 -0.0685 0" rpy="1.5707963 0 0"/>
+    <axis xyz="0 0 -1"/>
+    <dynamics damping="0.05" friction="0.02"/>
+  </joint>
+
+  <link name="right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_bringup)/meshes/wheel.stl"/>
+      </geometry>
+      <material name="wheel_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.0325"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.10"/>
+      <inertia ixx="0.000030" ixy="0" ixz="0" iyy="0.000030" iyz="0" izz="0.000050"/>
+    </inertial>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 5. BÁNH TỰ DO TRƯỚC (caster_wheel_link)    -->
+  <!-- ========================================== -->
+  <joint name="caster_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster_wheel_link"/>
+    <origin xyz="0.091 0 -0.0215" rpy="0 0 0"/>
+  </joint>
+
+  <link name="caster_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_bringup)/meshes/caster_wheel.stl"/>
+      </geometry>
+      <material name="caster_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <!-- Bán kính chuẩn 11.0mm khớp file CAD và khoảng cách từ trục tới sàn (0.0325 - 0.0215 = 0.011m) -->
+        <sphere radius="0.0110"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.08"/>
+      <inertia ixx="0.00005" ixy="0" ixz="0" iyy="0.00005" iyz="0" izz="0.00005"/>
+    </inertial>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 5b. ĐIỂM TỰA / VÍT CHỐNG LẬT SAU (HỞ SÀN 3.5mm) -->
+  <!-- Khớp bản vẽ 3D mới: Tru_chong_lat + Vit_M4_chong_lat tại X=-73.1mm, Z_min=3.5mm -->
+  <!-- Không chạm sàn khi đi thẳng (không kênh bánh), chỉ chạm sàn khi xe ngửa > 2.7 độ -->
+  <!-- ========================================== -->
+  <joint name="rear_anti_tip_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_anti_tip_link"/>
+    <origin xyz="-0.0731 0 -0.0250" rpy="0 0 0"/>
+  </joint>
+
+  <link name="rear_anti_tip_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <!-- Bán kính 4mm, tâm Z=-0.0250m -> Điểm thấp nhất Z=-0.0290m (cách sàn 32.5 - 29.0 = 3.5mm chuẩn 3D) -->
+        <sphere radius="0.0040"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.035"/>
+      <inertia ixx="0.000005" ixy="0" ixz="0" iyy="0.000005" iyz="0" izz="0.000005"/>
+    </inertial>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 6. CẢM BIẾN QUÁN TÍNH IMU (imu_link)       -->
+  <!-- ========================================== -->
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0.000 0 0.065" rpy="0 0 0"/>
+  </joint>
+
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.01"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+    </inertial>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 7. CẢM BIẾN LIDAR LD14 (laser_frame)       -->
+  <!-- Tâm xoay quang học quét chuẩn 3D FreeCAD (X_step=0.0mm -> X_rel=+0.020m) -->
+  <!-- ========================================== -->
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser_frame"/>
+    <origin xyz="0.020 0 0.1085" rpy="0 0 0"/>
+  </joint>
+
+  <link name="laser_frame">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="file://$(find robot_bringup)/meshes/lidar.stl"/>
+      </geometry>
+      <material name="lidar_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.030" length="0.028"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.05"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+    </inertial>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- CẤU HÌNH VẬT LÝ GAZEBO (MA SÁT & TIẾP XÚC) -->
+  <!-- ========================================== -->
+  <gazebo reference="left_wheel_link">
+    <!-- Ma sát lốp cao su bám sàn: mu1=100.0, mu2=100.0 (chống trượt bánh xe vi sai) -->
+    <mu1 value="100.0"/>
+    <mu2 value="100.0"/>
+    <kp value="200000.0"/>
+    <kd value="100.0"/>
+    <minDepth value="0.0005"/>
+  </gazebo>
+
+  <gazebo reference="right_wheel_link">
+    <mu1 value="100.0"/>
+    <mu2 value="100.0"/>
+    <kp value="200000.0"/>
+    <kd value="100.0"/>
+    <minDepth value="0.0005"/>
+  </gazebo>
+
+  <gazebo reference="caster_wheel_link">
+    <!-- Ma sát triệt tiêu để bánh tự do lăn trượt hoàn hảo mọi hướng, không cản trở góc quay vi sai -->
+    <mu1 value="0.0"/>
+    <mu2 value="0.0"/>
+    <kp value="100000.0"/>
+    <kd value="100.0"/>
+    <minDepth value="0.0005"/>
+  </gazebo>
+
+  <gazebo reference="rear_anti_tip_link">
+    <!-- Cữ chống lật sau: hở sàn 3.5mm, trượt tự do nếu chạm sàn khi giật lùi/phanh gấp -->
+    <mu1 value="0.0"/>
+    <mu2 value="0.0"/>
+    <kp value="100000.0"/>
+    <kd value="100.0"/>
+    <minDepth value="0.0005"/>
+  </gazebo>
+
+  <!-- ========================================== -->
+  <!-- PLUGIN GAZEBO HARMONIC: CẢM BIẾN IMU       -->
+  <!-- ========================================== -->
+  <gazebo reference="imu_link">
+    <sensor name="imu_sensor" type="imu">
+      <always_on>1</always_on>
+      <update_rate>50</update_rate>
+      <visualize>true</visualize>
+      <topic>/imu</topic>
+    </sensor>
+  </gazebo>
+
+  <!-- ========================================== -->
+  <!-- PLUGIN GAZEBO HARMONIC: CẢM BIẾN LIDAR     -->
+  <!-- ========================================== -->
+  <gazebo reference="laser_frame">
+    <sensor name="ld14_lidar" type="gpu_lidar">
+      <pose>0 0 0 0 0 0</pose>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
+      <update_rate>10</update_rate>
+      <topic>/scan</topic>
+      <gz_frame_id>laser_frame</gz_frame_id>
+      <ray>
+        <scan>
+          <horizontal>
+            <!-- 720 tia quét (độ phân giải 0.5 độ/tia) giúp vẽ tường và góc cua cực kỳ sắc nét -->
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>0.0</min_angle>
+            <max_angle>6.2831853</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <!-- min 0.15m để không bị tia quét phản xạ ngược vào vỏ xe -->
+          <min>0.15</min>
+          <max>10.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </ray>
+    </sensor>
+  </gazebo>
+
+  <!-- ========================================== -->
+  <!-- PLUGIN GAZEBO HARMONIC: ĐIỀU KHIỂN VI SAI  -->
+  <!-- ========================================== -->
+  <gazebo>
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.137</wheel_separation>
+      <wheel_radius>0.0325</wheel_radius>
+      <max_linear_acceleration>0.8</max_linear_acceleration>
+      <min_linear_acceleration>-0.8</min_linear_acceleration>
+      <max_angular_acceleration>2.0</max_angular_acceleration>
+      <min_angular_acceleration>-2.0</min_angular_acceleration>
+      <max_linear_velocity>0.6</max_linear_velocity>
+      <min_linear_velocity>-0.6</min_linear_velocity>
+      <max_angular_velocity>2.5</max_angular_velocity>
+      <min_angular_velocity>-2.5</min_angular_velocity>
+      
+      <topic>/cmd_vel</topic>
+      <odom_topic>/odom</odom_topic>
+      <tf_topic>/tf</tf_topic>
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+      <odom_publish_frequency>50</odom_publish_frequency>
+    </plugin>
+
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu">
+    </plugin>
+  </gazebo>
+
+</robot>
