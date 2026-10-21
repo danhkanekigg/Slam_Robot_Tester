@@ -1,0 +1,265 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="office_world">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Ánh sáng môi trường -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 12 0 0 0</pose>
+      <diffuse>0.85 0.85 0.88 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.4 0.2 -0.85</direction>
+    </light>
+
+    <!-- Mặt sàn 20m x 20m -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.68 0.68 0.68 1</ambient>
+            <diffuse>0.68 0.68 0.68 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- BẢN ĐỒ CẤP ĐỘ 2: VĂN PHÒNG THU HẸP 5 PHÒNG (DENSE OFFICE)-->
+    <!-- Kích thước: 7m x 7m, Toạ độ: X [-3.5, 3.5], Y [-3.5, 3.5]  -->
+    <!-- Đặc điểm: Cửa hẹp 0.7m, 4 phòng chức năng + sảnh chữ thập,-->
+    <!-- nội thất đặt sát tường tạo nhiều ngã rẽ và góc cua 90 độ -->
+    <!-- ======================================================= -->
+
+    <!-- Tường ngoài Bắc (Y = +3.5) -->
+    <model name="outer_north">
+      <static>true</static>
+      <pose>0 3.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>7.2 0.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>7.2 0.2 1.0</size></box></geometry>
+        <material><diffuse>0.35 0.4 0.45 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Nam (Y = -3.5) -->
+    <model name="outer_south">
+      <static>true</static>
+      <pose>0 -3.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>7.2 0.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>7.2 0.2 1.0</size></box></geometry>
+        <material><diffuse>0.35 0.4 0.45 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Tây (X = -3.5) -->
+    <model name="outer_west">
+      <static>true</static>
+      <pose>-3.5 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.2 7.0 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 7.0 1.0</size></box></geometry>
+        <material><diffuse>0.35 0.4 0.45 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Đông (X = +3.5) -->
+    <model name="outer_east">
+      <static>true</static>
+      <pose>3.5 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.2 7.0 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 7.0 1.0</size></box></geometry>
+        <material><diffuse>0.35 0.4 0.45 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- VÁCH NGĂN CHIA PHÒNG & HÀNH LANG CHỮ THẬP               -->
+    <!-- ======================================================= -->
+
+    <!-- Vách Tây-Bắc dọc (X = -0.7): có cửa hẹp 0.72m ở giữa -->
+    <model name="wall_nw_v1">
+      <static>true</static>
+      <pose>-0.7 2.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 1.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 1.2 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="wall_nw_v2">
+      <static>true</static>
+      <pose>-0.7 0.9 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 0.6 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 0.6 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách Đông-Bắc dọc (X = +0.7): có cửa hẹp 0.72m ở giữa -->
+    <model name="wall_ne_v1">
+      <static>true</static>
+      <pose>0.7 2.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 1.2 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 1.2 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="wall_ne_v2">
+      <static>true</static>
+      <pose>0.7 0.9 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 0.6 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 0.6 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách ngang Bắc (Y = 0.6): nối vách dọc ra tường ngoài -->
+    <model name="wall_nw_h">
+      <static>true</static>
+      <pose>-2.1 0.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>2.6 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.6 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="wall_ne_h">
+      <static>true</static>
+      <pose>2.1 0.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>2.6 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>2.6 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách ngang Nam (Y = -0.6): có cửa hẹp 0.72m vào phòng phía Nam -->
+    <model name="wall_sw_h1">
+      <static>true</static>
+      <pose>-2.7 -0.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.4 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.4 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="wall_sw_h2">
+      <static>true</static>
+      <pose>-1.0 -0.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.6 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.6 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_se_h1">
+      <static>true</static>
+      <pose>2.7 -0.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.4 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.4 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="wall_se_h2">
+      <static>true</static>
+      <pose>1.0 -0.6 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.6 0.15 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.6 0.15 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Vách ngăn dọc chia đôi 2 phòng phía Nam (X = 0, Y từ -3.5 đến -0.6) -->
+    <model name="wall_south_divider">
+      <static>true</static>
+      <pose>0.0 -2.0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.15 2.6 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.15 2.6 1.0</size></box></geometry>
+        <material><diffuse>0.5 0.55 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- ĐỒ NỘI THẤT / VẬT CẢN TẠO THÊM NGÃ RẼ TRONG PHÒNG       -->
+    <!-- ======================================================= -->
+
+    <!-- Bàn làm việc Phòng Tây-Bắc -->
+    <model name="desk_nw">
+      <static>true</static>
+      <pose>-2.5 2.3 0.35 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.2 0.6 0.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.2 0.6 0.7</size></box></geometry>
+        <material><diffuse>0.7 0.45 0.25 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Bàn họp Phòng Đông-Bắc -->
+    <model name="table_ne">
+      <static>true</static>
+      <pose>2.1 2.1 0.35 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.2 0.8 0.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.2 0.8 0.7</size></box></geometry>
+        <material><diffuse>0.3 0.4 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Cụm bàn góc Phòng Tây-Nam -->
+    <model name="desk_sw">
+      <static>true</static>
+      <pose>-2.2 -2.2 0.35 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.0 0.6 0.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.0 0.6 0.7</size></box></geometry>
+        <material><diffuse>0.7 0.45 0.25 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tủ pantry Phòng Đông-Nam -->
+    <model name="cabinet_se">
+      <static>true</static>
+      <pose>2.2 -2.4 0.45 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.2 0.5 0.9</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.2 0.5 0.9</size></box></geometry>
+        <material><diffuse>0.35 0.6 0.4 1</diffuse></material></visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

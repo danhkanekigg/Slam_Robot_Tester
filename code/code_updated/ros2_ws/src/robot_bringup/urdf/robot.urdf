@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<robot name="diff_drive_robot">
+
+  <!-- ========================================== -->
+  <!-- ĐỊNH NGHĨA MÀU SẮC & VẬT LIỆU (RVIZ)       -->
+  <!-- ========================================== -->
+  <material name="chassis_color"><color rgba="0.15 0.35 0.85 0.9"/></material>
+  <material name="wheel_color"><color rgba="0.1 0.1 0.1 1.0"/></material>
+  <material name="caster_color"><color rgba="0.85 0.85 0.85 1.0"/></material>
+  <material name="lidar_color"><color rgba="0.9 0.1 0.1 1.0"/></material>
+
+  <!-- ========================================== -->
+  <!-- 1. CHUẨN ROS REP-105: base_footprint       -->
+  <!-- ========================================== -->
+  <link name="base_footprint"/>
+
+  <!-- ========================================== -->
+  <!-- 2. KHUNG TỌA ĐỘ TRỤC XE: base_link        -->
+  <!-- ========================================== -->
+  <joint name="base_footprint_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.0325" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robot_bringup/meshes/chassis.stl"/>
+      </geometry>
+      <material name="chassis_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0.020 0 0.020" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.210 0.170 0.022"/>
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="0.020 0 0.065" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.210 0.170 0.025"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 3. BÁNH CHỦ ĐỘNG TRÁI                     -->
+  <!-- ========================================== -->
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="left_wheel_link"/>
+    <origin xyz="0 0.0685 0" rpy="-1.5707963 0 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="left_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robot_bringup/meshes/wheel.stl"/>
+      </geometry>
+      <material name="wheel_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.0325"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 4. BÁNH CHỦ ĐỘNG PHẢI                    -->
+  <!-- ========================================== -->
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="right_wheel_link"/>
+    <origin xyz="0 -0.0685 0" rpy="1.5707963 0 0"/>
+    <axis xyz="0 0 -1"/>
+  </joint>
+
+  <link name="right_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robot_bringup/meshes/wheel.stl"/>
+      </geometry>
+      <material name="wheel_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.0325"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 5. BÁNH TỰ DO TRƯỚC (CASTER WHEEL)        -->
+  <!-- ========================================== -->
+  <joint name="caster_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="caster_wheel_link"/>
+    <origin xyz="0.091 0 -0.0215" rpy="0 0 0"/>
+  </joint>
+
+  <link name="caster_wheel_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robot_bringup/meshes/caster_wheel.stl"/>
+      </geometry>
+      <material name="caster_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <sphere radius="0.011"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- ========================================== -->
+  <!-- 6. CẢM BIẾN QUÁN TÍNH MPU6050 (IMU)        -->
+  <!-- ========================================== -->
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0.000 0 0.065" rpy="0 0 0"/>
+  </joint>
+
+  <link name="imu_link"/>
+
+  <!-- ========================================== -->
+  <!-- 7. CẢM BIẾN LIDAR LD14                     -->
+  <!-- ========================================== -->
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser_frame"/>
+    <origin xyz="0.020 0 0.1085" rpy="0 0 0"/>
+  </joint>
+
+  <link name="laser_frame">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://robot_bringup/meshes/lidar.stl"/>
+      </geometry>
+      <material name="lidar_color"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.030" length="0.028"/>
+      </geometry>
+    </collision>
+  </link>
+
+</robot>

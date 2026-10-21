@@ -1,0 +1,262 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="warehouse_world">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Ánh sáng môi trường nhà xưởng -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 12 0 0 0</pose>
+      <diffuse>0.85 0.85 0.9 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.3 0.3 -0.9</direction>
+    </light>
+
+    <!-- Mặt sàn kho hàng 20m x 20m -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>20 20</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.52 0.52 0.55 1</ambient>
+            <diffuse>0.52 0.52 0.55 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- BẢN ĐỒ CẤP ĐỘ 3: KHO HÀNG THU HẸP, HÀNH LANG SÁT & NGÕ CỤT-->
+    <!-- Kích thước: 8m x 6.5m, Toạ độ: X [-4, 4], Y [-3.25, 3.25]-->
+    <!-- Đặc điểm độ khó:                                       -->
+    <!--   - 4 dãy kệ hàng song song hẹp (0.75m)                -->
+    <!--   - 3 NGÕ CỤT (DEAD-ENDS) bít bởi kiện hàng            -->
+    <!--   - Cột trụ tròn giữa lối đi chính                      -->
+    <!--   - Khúc cua chữ U hẹp quanh đầu kệ                     -->
+    <!-- ======================================================= -->
+
+    <!-- Tường ngoài Bắc (Y = +3.25) -->
+    <model name="wall_outer_north">
+      <static>true</static>
+      <pose>0 3.25 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>8.2 0.2 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>8.2 0.2 1.2</size></box></geometry>
+        <material><diffuse>0.3 0.35 0.4 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Nam (Y = -3.25) -->
+    <model name="wall_outer_south">
+      <static>true</static>
+      <pose>0 -3.25 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>8.2 0.2 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>8.2 0.2 1.2</size></box></geometry>
+        <material><diffuse>0.3 0.35 0.4 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Tây (X = -4.0) -->
+    <model name="wall_outer_west">
+      <static>true</static>
+      <pose>-4.0 0 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.2 6.5 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 6.5 1.2</size></box></geometry>
+        <material><diffuse>0.3 0.35 0.4 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Tường ngoài Đông (X = +4.0) -->
+    <model name="wall_outer_east">
+      <static>true</static>
+      <pose>4.0 0 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.2 6.5 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.2 6.5 1.2</size></box></geometry>
+        <material><diffuse>0.3 0.35 0.4 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- 4 DÃY KỆ HÀNG SONG SONG (DENSE SHELVING AISLES)         -->
+    <!-- ======================================================= -->
+
+    <!-- DÃY KỆ 1 (X = -2.6): Tây -->
+    <model name="rack_1_north">
+      <static>true</static>
+      <pose>-2.6 1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.65 2.0 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.65 2.0 1.2</size></box></geometry>
+        <material><diffuse>0.15 0.35 0.7 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="rack_1_south">
+      <static>true</static>
+      <pose>-2.6 -1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.65 2.0 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.65 2.0 1.2</size></box></geometry>
+        <material><diffuse>0.15 0.35 0.7 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- DÃY KỆ 2 (X = -1.2): Tây Trung Tâm -->
+    <model name="rack_2_north">
+      <static>true</static>
+      <pose>-1.2 1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.65 2.0 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.65 2.0 1.2</size></box></geometry>
+        <material><diffuse>0.2 0.55 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="rack_2_south">
+      <static>true</static>
+      <pose>-1.2 -1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.65 2.0 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.65 2.0 1.2</size></box></geometry>
+        <material><diffuse>0.2 0.55 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- DÃY KỆ 3 (X = +1.2): Đông Trung Tâm -->
+    <model name="rack_3_north">
+      <static>true</static>
+      <pose>1.2 1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.65 2.0 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.65 2.0 1.2</size></box></geometry>
+        <material><diffuse>0.75 0.4 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="rack_3_south">
+      <static>true</static>
+      <pose>1.2 -1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.65 2.0 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.65 2.0 1.2</size></box></geometry>
+        <material><diffuse>0.75 0.4 0.1 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- DÃY KỆ 4 (X = +2.6): Đông -->
+    <model name="rack_4_north">
+      <static>true</static>
+      <pose>2.6 1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.65 2.0 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.65 2.0 1.2</size></box></geometry>
+        <material><diffuse>0.65 0.2 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+    <model name="rack_4_south">
+      <static>true</static>
+      <pose>2.6 -1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.65 2.0 1.2</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.65 2.0 1.2</size></box></geometry>
+        <material><diffuse>0.65 0.2 0.6 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- 3 NGÕ CỤT (DEAD-ENDS) THỬ THÁCH THOÁT KẸT VÀ QUAY ĐẦU    -->
+    <!-- ======================================================= -->
+
+    <!-- NGÕ CỤT 1 (Tây Bắc): Bít đầu hẻm giữa Kệ 1 và tường Tây -->
+    <model name="dead_end_1">
+      <static>true</static>
+      <pose>-3.35 2.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>1.2 0.6 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>1.2 0.6 1.0</size></box></geometry>
+        <material><diffuse>0.85 0.25 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- NGÕ CỤT 2 (Tây Nam): Bít đầu hẻm giữa Kệ 1 và Kệ 2 -->
+    <model name="dead_end_2">
+      <static>true</static>
+      <pose>-1.9 -2.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.8 0.6 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.8 0.6 1.0</size></box></geometry>
+        <material><diffuse>0.85 0.25 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- NGÕ CỤT 3 (Đông Bắc): Bít đầu hẻm giữa Kệ 3 và Kệ 4 -->
+    <model name="dead_end_3">
+      <static>true</static>
+      <pose>1.9 2.8 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.8 0.6 1.0</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.8 0.6 1.0</size></box></geometry>
+        <material><diffuse>0.85 0.25 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- ======================================================= -->
+    <!-- CỘT TRỤ CHỊU LỰC GIỮA LỐI ĐI CHÍNH                      -->
+    <!-- ======================================================= -->
+
+    <model name="pillar_mid_north">
+      <static>true</static>
+      <pose>0.0 1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><cylinder><radius>0.20</radius><length>1.2</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.20</radius><length>1.2</length></cylinder></geometry>
+        <material><diffuse>0.8 0.8 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <model name="pillar_mid_south">
+      <static>true</static>
+      <pose>0.0 -1.8 0.6 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><cylinder><radius>0.20</radius><length>1.2</length></cylinder></geometry></collision>
+        <visual name="v"><geometry><cylinder><radius>0.20</radius><length>1.2</length></cylinder></geometry>
+        <material><diffuse>0.8 0.8 0.2 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- CHƯỚNG NGẠI THÙNG HÀNG TẠO HẺM GẤP KHÚC PHÍA ĐÔNG -->
+    <model name="box_chicane_east">
+      <static>true</static>
+      <pose>3.4 0.0 0.35 0 0 0</pose>
+      <link name="link">
+        <collision name="c"><geometry><box><size>0.6 0.6 0.7</size></box></geometry></collision>
+        <visual name="v"><geometry><box><size>0.6 0.6 0.7</size></box></geometry>
+        <material><diffuse>0.7 0.5 0.3 1</diffuse></material></visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
