@@ -1,0 +1,18 @@
+# Altium Designer ignore files
+History/
+__Previews/
+*.LOG
+*.log
+*.zip
+*.Rpt
+*.htm
+*.html
+*.Txt
+*.txt.rep
+*.rep
+*.CSV
+*.csv
+*.~*
+*.tmp
+Project Logs for */
+Project Outputs for */
